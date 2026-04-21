@@ -3,641 +3,433 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prakitesh Bakshi | Superman 3D Portfolio</title>
-  <meta name="description" content="Immersive Superman-themed 3D portfolio for Prakitesh Bakshi." />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <title>Prakitesh Bakshi | Cinematic Superman Portfolio</title>
+  <meta name="description" content="Cinematic Superman-inspired portfolio for Prakitesh Bakshi." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --red: #CC0000;
-      --blue: #0033A0;
-      --gold: #FDD835;
-      --bg: #0a0a0f;
-      --text: #f3f6ff;
-      --muted: #c7d4ff;
-      --panel: rgba(9, 16, 40, 0.8);
+      --bg: #0a0a1a;
+      --bg-deep: #05050f;
+      --blue: #1a3a8f;
+      --red: #c0392b;
+      --gold: #f1c40f;
+      --text: #ffffff;
+      --muted: #cbd4f6;
+      --glass: rgba(14, 20, 44, 0.56);
+      --border: rgba(255, 255, 255, 0.15);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      cursor: none;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
 
     body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--bg);
+      font-family: "Inter", sans-serif;
       color: var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(26, 58, 143, 0.35), transparent 35%),
+        radial-gradient(circle at 78% 18%, rgba(112, 73, 190, 0.2), transparent 30%),
+        radial-gradient(circle at 50% 58%, rgba(26, 58, 143, 0.15), transparent 42%),
+        var(--bg-deep);
       overflow-x: hidden;
     }
 
-    #progress {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--red), #ff6060);
-      z-index: 1000;
-      box-shadow: 0 0 14px rgba(204, 0, 0, 0.9);
-    }
-
-    .crosshair {
-      position: fixed;
-      width: 30px;
-      height: 30px;
-      border: 2px solid var(--red);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 2000;
-      mix-blend-mode: screen;
-      box-shadow: 0 0 10px rgba(204, 0, 0, 0.8);
-    }
-
-    .crosshair::before,
-    .crosshair::after {
+    .stars-layer,
+    .stars-layer::before,
+    .stars-layer::after {
       content: "";
-      position: absolute;
-      background: var(--red);
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .crosshair::before {
-      width: 2px;
-      height: 18px;
-    }
-
-    .crosshair::after {
-      width: 18px;
-      height: 2px;
-    }
-
-    .cape {
-      position: fixed;
-      top: 40%;
-      left: 20px;
-      width: 68px;
-      height: 140px;
-      z-index: 900;
-      pointer-events: none;
-      opacity: 0.85;
-      transition: transform 0.15s ease-out;
-    }
-
-    .cape svg {
-      width: 100%;
-      height: 100%;
-      filter: drop-shadow(0 0 10px rgba(204, 0, 0, 0.7));
-    }
-
-    #hero-canvas {
       position: fixed;
       inset: 0;
-      z-index: -1;
+      pointer-events: none;
+      z-index: -2;
+      background-repeat: repeat;
+      background-image:
+        radial-gradient(2px 2px at 40px 60px, rgba(255,255,255,0.9), transparent 50%),
+        radial-gradient(1.5px 1.5px at 160px 140px, rgba(173, 201, 255, 0.8), transparent 50%),
+        radial-gradient(1.8px 1.8px at 260px 90px, rgba(205, 220, 255, 0.7), transparent 55%),
+        radial-gradient(1.4px 1.4px at 120px 220px, rgba(255,255,255,0.65), transparent 50%);
+      background-size: 320px 260px;
+      transform: translateY(var(--star-shift, 0px));
+    }
+
+    .stars-layer::before {
+      opacity: 0.55;
+      transform: translateY(calc(var(--star-shift, 0px) * 0.65));
+    }
+
+    .stars-layer::after {
+      opacity: 0.35;
+      transform: translateY(calc(var(--star-shift, 0px) * 0.4));
     }
 
     section {
-      min-height: 100vh;
-      width: min(1150px, 92%);
+      width: min(1080px, 92%);
       margin: 0 auto;
-      padding: 80px 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      padding: 96px 0;
       position: relative;
+      z-index: 1;
     }
 
-    .panel-cut::before {
-      content: "";
-      position: absolute;
-      inset: 10% -5%;
-      background: linear-gradient(120deg, rgba(255, 255, 255, 0.05), transparent 45%);
-      transform: skewY(-3deg);
-      pointer-events: none;
-      opacity: 0.5;
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      align-items: center;
+      grid-template-columns: 1fr 1fr;
+      gap: 44px;
     }
 
-    .hero-content {
-      max-width: 760px;
-      background: var(--panel);
-      border: 1px solid rgba(253, 216, 53, 0.45);
-      border-radius: 20px;
-      padding: 28px;
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(5px);
+    .hero h1,
+    h2,
+    h3 {
+      font-family: "Bebas Neue", sans-serif;
+      letter-spacing: 0.04em;
+      line-height: 1;
     }
 
-    .kicker {
-      display: inline-block;
-      background: rgba(204, 0, 0, 0.18);
-      border: 1px solid rgba(204, 0, 0, 0.7);
-      color: #ffd4d4;
-      font-size: 0.82rem;
-      padding: 5px 10px;
-      border-radius: 999px;
-      margin-bottom: 12px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+    .hero h1 {
+      font-size: clamp(2.6rem, 9vw, 6.4rem);
+      color: var(--text);
+      text-shadow: 0 0 24px rgba(26, 58, 143, 0.65);
+      min-height: 1.1em;
     }
 
-    h1, h2 {
-      line-height: 1.2;
-      margin-bottom: 12px;
-    }
-
-    h1 {
-      font-size: clamp(2rem, 6vw, 4rem);
+    .hero h2 {
+      font-size: clamp(1.45rem, 3.6vw, 2.4rem);
       color: var(--gold);
-      text-shadow: 0 0 18px rgba(253, 216, 53, 0.35);
+      margin: 6px 0 12px;
     }
 
-    h2 {
-      font-size: clamp(1.5rem, 4vw, 2.5rem);
-      color: var(--gold);
-    }
-
-    .type-line {
-      font-size: clamp(1.1rem, 2.3vw, 1.55rem);
+    .hero .meta {
+      font-size: 1.05rem;
       color: var(--muted);
-      min-height: 2.2rem;
-      margin-bottom: 12px;
+      max-width: 44ch;
+      margin-bottom: 18px;
     }
 
-    .lead {
-      color: #f1f5ff;
-      max-width: 70ch;
+    .hero .tagline {
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      color: #eaf0ff;
+      border-left: 3px solid var(--red);
+      padding-left: 12px;
     }
 
-    .about-card {
-      background: var(--panel);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-left: 6px solid var(--red);
-      border-radius: 16px;
+    .shield-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 460px;
+    }
+
+    .god-rays {
+      position: absolute;
+      inset: 10% 0;
+      filter: blur(4px);
+      opacity: 0.55;
+    }
+
+    .ray {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 520px;
+      height: 12px;
+      transform-origin: left center;
+      background: linear-gradient(90deg, rgba(241, 196, 15, 0.55), transparent 70%);
+      border-radius: 999px;
+      mix-blend-mode: screen;
+    }
+
+    .ray:nth-child(1) { transform: rotate(12deg); }
+    .ray:nth-child(2) { transform: rotate(-16deg); opacity: 0.45; }
+    .ray:nth-child(3) { transform: rotate(34deg); opacity: 0.4; }
+    .ray:nth-child(4) { transform: rotate(-36deg); opacity: 0.4; }
+    .ray:nth-child(5) { transform: rotate(58deg); opacity: 0.3; }
+    .ray:nth-child(6) { transform: rotate(-58deg); opacity: 0.3; }
+
+    .shield {
+      width: min(420px, 90%);
+      filter: drop-shadow(0 0 20px rgba(192, 57, 43, 0.85));
+      animation: shieldPulse 3.8s ease-in-out infinite;
+      transform: translateZ(0);
+    }
+
+    @keyframes shieldPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 16px rgba(241, 196, 15, 0.35)); }
+      50% { transform: scale(1.03); filter: drop-shadow(0 0 32px rgba(241, 196, 15, 0.85)); }
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .about-card,
+    .skills-card,
+    .project-card,
+    .contact-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+      border-radius: 18px;
       padding: 22px;
-      transform: perspective(900px) rotateX(4deg);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
     }
 
-    .about-list {
-      margin-top: 12px;
-      list-style: none;
+    .about-card p {
+      color: #edf1ff;
+      max-width: 70ch;
+      line-height: 1.7;
+    }
+
+    .skills-grid {
       display: grid;
-      gap: 8px;
-    }
-
-    .about-list li {
-      background: rgba(0, 51, 160, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 10px;
-      padding: 10px 12px;
-    }
-
-    .hex-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 18px 14px;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
       margin-top: 14px;
     }
 
-    .hex {
-      position: relative;
-      width: 110px;
-      height: 126px;
-      margin: 0 auto;
-      clip-path: polygon(50% 0%, 94% 25%, 94% 75%, 50% 100%, 6% 75%, 6% 25%);
-      background: linear-gradient(145deg, rgba(0, 51, 160, 0.9), rgba(12, 24, 64, 0.95));
-      border: 1px solid rgba(253, 216, 53, 0.2);
-      display: grid;
-      place-items: center;
+    .skill {
       text-align: center;
-      padding: 10px;
+      padding: 12px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(241, 196, 15, 0.35);
+      background: linear-gradient(140deg, rgba(26, 58, 143, 0.4), rgba(192, 57, 43, 0.2));
       font-weight: 600;
-      color: #d9e5ff;
-      transform-style: preserve-3d;
-      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-    }
-
-    .hex:hover {
-      background: linear-gradient(145deg, rgba(253, 216, 53, 0.98), rgba(240, 188, 8, 0.95));
-      color: #1a1a1a;
-      box-shadow: 0 0 24px rgba(253, 216, 53, 0.8);
-      transform: translateY(-8px) rotateY(8deg);
+      color: #f7f9ff;
     }
 
     .projects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      margin-top: 16px;
-      perspective: 1200px;
-    }
-
-    .flip-card {
-      height: 280px;
-      transform-style: preserve-3d;
-      position: relative;
-    }
-
-    .flip-inner {
-      position: absolute;
-      inset: 0;
-      transform-style: preserve-3d;
-      transition: transform 0.65s ease;
-    }
-
-    .flip-card:hover .flip-inner {
-      transform: rotateY(180deg);
-    }
-
-    .face {
-      position: absolute;
-      inset: 0;
-      border-radius: 16px;
-      backface-visibility: hidden;
-      padding: 20px;
-      background: rgba(10, 20, 48, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
-    }
-
-    .face p {
-      color: #dce7ff;
-      margin-bottom: 10px;
-    }
-
-    .back {
-      transform: rotateY(180deg);
-      background: rgba(204, 0, 0, 0.78);
-      border: 1px solid rgba(253, 216, 53, 0.7);
-      color: #fff6df;
-    }
-
-    .stack-mini {
-      list-style: none;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 18px;
       margin-top: 8px;
-      display: grid;
-      gap: 6px;
-      font-size: 0.95rem;
     }
 
-    .project-link {
-      display: inline-block;
-      margin-top: 12px;
-      text-decoration: none;
-      background: var(--gold);
-      color: #1e1a04;
-      border-radius: 10px;
-      padding: 8px 12px;
-      font-weight: 700;
+    .project-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     }
 
-    .contact-wrap {
-      display: grid;
-      gap: 14px;
-      max-width: 560px;
+    .project-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(192, 57, 43, 0.9);
+      box-shadow: 0 0 24px rgba(192, 57, 43, 0.5), 0 22px 30px rgba(0, 0, 0, 0.35);
     }
 
-    .contact-item {
-      background: var(--panel);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-      padding: 12px 14px;
-    }
-
-    .send-signal {
-      display: inline-block;
-      text-decoration: none;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      font-weight: 700;
-      background: var(--red);
+    .project-card h3 {
+      font-size: 1.8rem;
       color: #fff;
-      border: 1px solid rgba(253, 216, 53, 0.75);
+      margin-bottom: 8px;
+    }
+
+    .project-card p {
+      color: #d8e2ff;
+      margin-bottom: 10px;
+      line-height: 1.65;
+    }
+
+    .stack-pill {
+      display: inline-block;
+      margin: 4px 6px 0 0;
+      font-size: 0.82rem;
+      padding: 5px 8px;
       border-radius: 999px;
-      padding: 12px 24px;
-      box-shadow: 0 0 16px rgba(204, 0, 0, 0.95);
-      animation: pulse 1.8s infinite;
-      width: fit-content;
+      border: 1px solid rgba(241, 196, 15, 0.45);
+      background: rgba(241, 196, 15, 0.1);
+      color: #fff8d2;
     }
 
-    .comic-reveal {
-      opacity: 0;
-      transform: translateY(45px);
+    .contact-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+      color: #e6ecff;
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.06); }
+    .contact-grid a {
+      color: #ffe57c;
+      text-decoration: none;
     }
 
-    @media (max-width: 850px) {
-      .cape {
-        display: none;
+    .signal-btn {
+      margin-top: 16px;
+      display: inline-block;
+      text-decoration: none;
+      font-family: "Bebas Neue", sans-serif;
+      letter-spacing: 0.08em;
+      font-size: 1.25rem;
+      color: #fff;
+      background: linear-gradient(130deg, #94271d, var(--red));
+      border: 1px solid rgba(241, 196, 15, 0.8);
+      border-radius: 999px;
+      padding: 12px 26px;
+      box-shadow: 0 0 20px rgba(192, 57, 43, 0.9);
+    }
+
+    .signal-btn:hover { filter: brightness(1.12); }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        text-align: center;
       }
-      .hero-content {
-        padding: 22px;
+      .hero .meta, .hero .tagline {
+        margin-left: auto;
+        margin-right: auto;
       }
-      * {
-        cursor: auto;
+      .hero .tagline {
+        border-left: 0;
+        border-top: 3px solid var(--red);
+        padding-left: 0;
+        padding-top: 12px;
       }
-      .crosshair {
-        display: none;
+      .shield-wrap {
+        min-height: 320px;
+      }
+      section {
+        padding: 82px 0;
       }
     }
   </style>
 </head>
 <body>
-  <div id="progress"></div>
-  <canvas id="hero-canvas"></canvas>
-  <div class="crosshair" id="crosshair"></div>
-  <div class="cape" id="cape">
-    <svg viewBox="0 0 120 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M60 10 C100 24, 116 72, 97 124 C84 162, 79 190, 60 210 C41 190, 36 162, 23 124 C4 72, 20 24, 60 10Z" fill="#CC0000" />
-      <path d="M60 20 C90 33, 102 75, 87 119 C77 149, 73 171, 60 188 C47 171, 43 149, 33 119 C18 75, 30 33, 60 20Z" fill="#FDD835" opacity="0.18" />
-    </svg>
-  </div>
+  <div class="stars-layer" aria-hidden="true"></div>
 
-  <section id="hero" class="panel-cut">
-    <div class="hero-content comic-reveal">
-      <span class="kicker">Metropolis Feed: Live</span>
-      <h1 id="hero-name"></h1>
-      <p class="type-line" id="hero-tagline"></p>
-      <p class="lead">
-        B.Tech CSBS, IEM Kolkata (Semester 4). Building practical AI + full-stack products with super-speed iteration and relentless debugging grit.
-      </p>
+  <section class="hero">
+    <div>
+      <h1 id="typedName"></h1>
+      <h2>B.Tech CSBS, IEM Kolkata</h2>
+      <p class="meta">Building AI-powered products with cinematic ambition and production-focused engineering.</p>
+      <p class="tagline">"Faster than a debugging session."</p>
+    </div>
+    <div class="shield-wrap">
+      <div class="god-rays" aria-hidden="true">
+        <div class="ray"></div><div class="ray"></div><div class="ray"></div>
+        <div class="ray"></div><div class="ray"></div><div class="ray"></div>
+      </div>
+      <svg class="shield" viewBox="0 0 800 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Superman inspired S shield">
+        <defs>
+          <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f8de5a"/>
+            <stop offset="100%" stop-color="#f1c40f"/>
+          </linearGradient>
+          <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#d04a3c"/>
+            <stop offset="100%" stop-color="#9e261b"/>
+          </linearGradient>
+        </defs>
+        <polygon points="400,32 730,120 656,472 400,588 144,472 70,120" fill="url(#goldGrad)"/>
+        <polygon points="400,66 690,142 626,444 400,545 174,444 110,142" fill="url(#redGrad)"/>
+        <path d="M212 208 C252 138, 360 130, 446 132 C540 134, 608 156, 596 236 C586 304, 518 318, 444 316 C388 314, 340 308, 306 322 C286 330, 282 356, 304 370 C334 390, 402 392, 466 390 C528 388, 566 372, 590 356 L560 438 C524 454, 468 464, 388 464 C318 464, 234 452, 200 406 C174 372, 172 328, 198 292 C230 246, 286 226, 368 226 C436 226, 486 236, 514 222 C530 214, 534 198, 520 186 C500 170, 446 164, 394 166 C332 168, 274 178, 236 198 Z"
+          fill="url(#goldGrad)"/>
+        <path d="M344 278 C394 276, 470 278, 512 286 C502 304, 472 322, 414 328 C356 334, 314 344, 294 364 C278 380, 282 404, 312 416 C354 434, 438 432, 500 420 L488 446 C430 460, 342 460, 286 438 C246 422, 232 388, 244 356 C262 310, 304 284, 344 278 Z"
+          fill="#a52a1f" opacity="0.48"/>
+      </svg>
     </div>
   </section>
 
-  <section id="about" class="panel-cut comic-reveal">
-    <h2>About</h2>
+  <section class="reveal">
+    <h2 class="section-title">About</h2>
     <div class="about-card">
       <p>
-        I am Prakitesh Bakshi, focused on machine learning systems and product-driven development. I enjoy turning hard problems into clean, useful software that people can trust.
+        I am Prakitesh Bakshi, a CSBS undergrad who enjoys solving hard engineering problems across AI and modern web backends.
+        I build systems that combine reliable APIs, usable frontend experiences, and practical machine learning.
       </p>
-      <ul class="about-list">
-        <li>Degree: B.Tech CSBS</li>
-        <li>College: Institute of Engineering and Management, Kolkata</li>
-        <li>Current Stage: Semester 4</li>
-        <li>Mindset: Learn fast, build faster, ship strongest.</li>
-      </ul>
     </div>
   </section>
 
-  <section id="skills" class="panel-cut comic-reveal">
-    <h2>Skills</h2>
-    <p class="lead">Hover each hex to charge it with solar energy.</p>
-    <div class="hex-grid">
-      <div class="hex">Python</div>
-      <div class="hex">Java</div>
-      <div class="hex">C</div>
-      <div class="hex">React</div>
-      <div class="hex">FastAPI</div>
-      <div class="hex">Django</div>
-      <div class="hex">Keras/TF</div>
-      <div class="hex">PostgreSQL</div>
-      <div class="hex">Git</div>
+  <section class="reveal">
+    <h2 class="section-title">Skills</h2>
+    <div class="skills-card">
+      <div class="skills-grid">
+        <div class="skill">Python</div>
+        <div class="skill">Java</div>
+        <div class="skill">C</div>
+        <div class="skill">React</div>
+        <div class="skill">FastAPI</div>
+        <div class="skill">Django</div>
+        <div class="skill">Keras</div>
+        <div class="skill">PostgreSQL</div>
+        <div class="skill">Git</div>
+      </div>
     </div>
   </section>
 
-  <section id="projects" class="panel-cut comic-reveal">
-    <h2>Projects</h2>
+  <section class="reveal">
+    <h2 class="section-title">Projects</h2>
     <div class="projects-grid">
-      <article class="flip-card">
-        <div class="flip-inner">
-          <div class="face front">
-            <h3>Deepfake Detection</h3>
-            <p>CNN-powered detection pipeline with full-stack deployment strategy.</p>
-            <p>Frontend with React/Vite and model-serving via FastAPI.</p>
-            <p>Goal: detect manipulated media with fast, usable feedback.</p>
-          </div>
-          <div class="face back">
-            <h3>Tech Stack</h3>
-            <ul class="stack-mini">
-              <li>CNN Architecture</li>
-              <li>React + Vite</li>
-              <li>FastAPI Backend</li>
-              <li>Python ML Pipeline</li>
-            </ul>
-            <a class="project-link" href="https://github.com/Prakitesh28/Deepfake_Detection" target="_blank" rel="noopener noreferrer">Open Repo</a>
-          </div>
-        </div>
+      <article class="project-card">
+        <h3>Deepfake Detection</h3>
+        <p>A CNN-based detection system with a responsive React frontend and FastAPI backend for fast inference workflows.</p>
+        <span class="stack-pill">CNN</span>
+        <span class="stack-pill">FastAPI</span>
+        <span class="stack-pill">React</span>
       </article>
-
-      <article class="flip-card">
-        <div class="flip-inner">
-          <div class="face front">
-            <h3>Luv 2 Learn (SIH 2025)</h3>
-            <p>Skill-matching application designed for smarter learning pathways.</p>
-            <p>Matches learners with opportunities, mentors, and relevant tracks.</p>
-            <p>Built for impact-oriented hackathon execution.</p>
-          </div>
-          <div class="face back">
-            <h3>Core Focus</h3>
-            <ul class="stack-mini">
-              <li>Recommendation Logic</li>
-              <li>User Skill Profiling</li>
-              <li>Full-stack Prototyping</li>
-              <li>Hackathon-grade Delivery</li>
-            </ul>
-            <a class="project-link" href="#contact">Send Signal</a>
-          </div>
-        </div>
+      <article class="project-card">
+        <h3>Luv 2 Learn</h3>
+        <p>SIH 2025 skill-matching app focused on connecting learners with personalized growth opportunities.</p>
+        <span class="stack-pill">SIH 2025</span>
+        <span class="stack-pill">Skill Matching</span>
+        <span class="stack-pill">Full Stack</span>
       </article>
     </div>
   </section>
 
-  <section id="contact" class="panel-cut comic-reveal">
-    <h2>Contact</h2>
-    <div class="contact-wrap">
-      <div class="contact-item"><strong>Name:</strong> Prakitesh Bakshi</div>
-      <div class="contact-item"><strong>Email:</strong> prakiteshbakshi28@gmail.com</div>
-      <div class="contact-item"><strong>LinkedIn:</strong> linkedin.com/in/prakitesh-bakshi-90872931a</div>
-      <div class="contact-item"><strong>GitHub:</strong> github.com/Prakitesh28</div>
-      <a class="send-signal" href="mailto:prakiteshbakshi28@gmail.com?subject=Signal%20from%20Metropolis&body=Hi%20Prakitesh%2C%20let%27s%20build%20something%20legendary.">SEND SIGNAL</a>
+  <section class="reveal">
+    <h2 class="section-title">Contact</h2>
+    <div class="contact-card">
+      <div class="contact-grid">
+        <div><strong>Name:</strong> Prakitesh Bakshi</div>
+        <div><strong>Email:</strong> <a href="mailto:prakiteshbakshi28@gmail.com">prakiteshbakshi28@gmail.com</a></div>
+        <div><strong>GitHub:</strong> <a href="https://github.com/Prakitesh28" target="_blank" rel="noopener noreferrer">github.com/Prakitesh28</a></div>
+      </div>
+      <a class="signal-btn" href="mailto:prakiteshbakshi28@gmail.com?subject=Project%20Signal">SEND SIGNAL</a>
     </div>
   </section>
 
   <script>
-    gsap.registerPlugin(ScrollTrigger);
-
-    const progress = document.getElementById("progress");
-    const crosshair = document.getElementById("crosshair");
-    const cape = document.getElementById("cape");
-    const heroName = document.getElementById("hero-name");
-    const heroTagline = document.getElementById("hero-tagline");
-
-    const fullName = "Prakitesh Bakshi";
-    const tagline = "Faster than a debugging session. Stronger than a segfault.";
-    let nameIndex = 0;
-    let tagIndex = 0;
+    const typedNameEl = document.getElementById("typedName");
+    const fullText = "PRAKITESH BAKSHI";
+    let charIndex = 0;
 
     function typeName() {
-      if (nameIndex <= fullName.length) {
-        heroName.textContent = fullName.slice(0, nameIndex);
-        nameIndex += 1;
+      if (charIndex <= fullText.length) {
+        typedNameEl.textContent = fullText.slice(0, charIndex);
+        charIndex += 1;
         setTimeout(typeName, 90);
-      } else {
-        typeTagline();
       }
     }
-
-    function typeTagline() {
-      if (tagIndex <= tagline.length) {
-        heroTagline.textContent = tagline.slice(0, tagIndex);
-        tagIndex += 1;
-        setTimeout(typeTagline, 45);
-      }
-    }
-
     typeName();
 
-    document.addEventListener("mousemove", (event) => {
-      crosshair.style.left = event.clientX + "px";
-      crosshair.style.top = event.clientY + "px";
-    });
-
-    window.addEventListener("scroll", () => {
-      const doc = document.documentElement;
-      const scrolled = (doc.scrollTop / (doc.scrollHeight - doc.clientHeight)) * 100;
-      progress.style.width = scrolled + "%";
-
-      if (window.innerWidth > 850) {
-        const y = window.scrollY * 0.2;
-        const sway = Math.sin(window.scrollY * 0.01) * 10;
-        cape.style.transform = "translateY(" + y + "px) rotate(" + sway + "deg)";
-      }
-    });
-
-    gsap.from(".hero-content", {
-      y: -80,
-      opacity: 0,
-      duration: 1.2,
-      ease: "power3.out"
-    });
-
-    gsap.utils.toArray(".comic-reveal").forEach((el) => {
-      gsap.to(el, {
-        opacity: 1,
-        y: 0,
-        duration: 1,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: el,
-          start: "top 80%",
-          toggleActions: "play none none reverse"
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
         }
       });
-    });
+    }, { threshold: 0.2 });
 
-    const canvas = document.getElementById("hero-canvas");
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 12;
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-    scene.add(ambientLight);
-    const pointLight = new THREE.PointLight(0xFDD835, 1.3, 100);
-    pointLight.position.set(3, 5, 8);
-    scene.add(pointLight);
-
-    const shieldGroup = new THREE.Group();
-    scene.add(shieldGroup);
-
-    const shieldShape = new THREE.Shape();
-    shieldShape.moveTo(0, 3);
-    shieldShape.bezierCurveTo(2.9, 2.6, 4.4, 0.8, 3.7, -1.7);
-    shieldShape.bezierCurveTo(3.2, -3.5, 2.2, -4.8, 0, -6);
-    shieldShape.bezierCurveTo(-2.2, -4.8, -3.2, -3.5, -3.7, -1.7);
-    shieldShape.bezierCurveTo(-4.4, 0.8, -2.9, 2.6, 0, 3);
-
-    const extrude = { depth: 0.55, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.24, bevelThickness: 0.2 };
-    const shieldGeom = new THREE.ExtrudeGeometry(shieldShape, extrude);
-    const shieldMat = new THREE.MeshStandardMaterial({
-      color: 0xCC0000,
-      emissive: 0x4A0000,
-      metalness: 0.45,
-      roughness: 0.28
-    });
-    const shieldMesh = new THREE.Mesh(shieldGeom, shieldMat);
-    shieldGroup.add(shieldMesh);
-
-    const lineMat = new THREE.MeshStandardMaterial({
-      color: 0xFDD835,
-      emissive: 0x9a7700,
-      metalness: 0.5,
-      roughness: 0.2
-    });
-    const sGeo = new THREE.TorusKnotGeometry(1.2, 0.24, 80, 12, 2, 3);
-    const sMesh = new THREE.Mesh(sGeo, lineMat);
-    sMesh.scale.set(0.9, 0.65, 0.35);
-    sMesh.position.z = 0.5;
-    shieldGroup.add(sMesh);
-    shieldGroup.position.set(0, 1.8, -1.5);
-
-    const starsCount = 1400;
-    const starsGeo = new THREE.BufferGeometry();
-    const starPos = new Float32Array(starsCount * 3);
-    const starVel = new Float32Array(starsCount);
-    for (let i = 0; i < starsCount; i++) {
-      const i3 = i * 3;
-      starPos[i3] = (Math.random() - 0.5) * 75;
-      starPos[i3 + 1] = (Math.random() - 0.5) * 75;
-      starPos[i3 + 2] = -Math.random() * 260;
-      starVel[i] = 0.1 + Math.random() * 0.5;
-    }
-    starsGeo.setAttribute("position", new THREE.BufferAttribute(starPos, 3));
-
-    const starsMat = new THREE.PointsMaterial({
-      color: 0x90a9ff,
-      size: 0.08,
-      transparent: true,
-      opacity: 0.9
-    });
-
-    const stars = new THREE.Points(starsGeo, starsMat);
-    scene.add(stars);
-
-    const clock = new THREE.Clock();
-    function animate() {
-      const elapsed = clock.getElapsedTime();
-      shieldGroup.rotation.y += 0.0055;
-      shieldGroup.rotation.x = Math.sin(elapsed * 0.6) * 0.08;
-      sMesh.rotation.z += 0.008;
-
-      const positions = stars.geometry.attributes.position.array;
-      for (let i = 0; i < starsCount; i++) {
-        const i3 = i * 3;
-        positions[i3 + 2] += starVel[i] * 0.8;
-        if (positions[i3 + 2] > 8) {
-          positions[i3] = (Math.random() - 0.5) * 75;
-          positions[i3 + 1] = (Math.random() - 0.5) * 75;
-          positions[i3 + 2] = -260;
-        }
+    const starLayer = document.querySelector(".stars-layer");
+    window.addEventListener("scroll", () => {
+      const shift = window.scrollY * -0.22;
+      document.documentElement.style.setProperty("--star-shift", shift + "px");
+      if (starLayer) {
+        starLayer.style.opacity = String(Math.max(0.55, 1 - window.scrollY / 2400));
       }
-      stars.geometry.attributes.position.needsUpdate = true;
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    }
-    animate();
-
-    window.addEventListener("resize", () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     });
   </script>
 </body>
