@@ -119,26 +119,6 @@
       line-height: 0.88;
     }
 
-    .hero-shield-wrap {
-      margin-top: 18px;
-      width: min(210px, 42vw);
-      filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.35))
-              drop-shadow(0 0 20px rgba(204, 0, 0, 0.35));
-      animation: shieldFloat 4.2s ease-in-out infinite;
-      transform-origin: center;
-    }
-
-    .hero-shield {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    @keyframes shieldFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
-    }
-
     .hero-sub {
       margin-top: 10px;
       font-family: "Barlow Condensed", sans-serif;
@@ -464,9 +444,6 @@
       .hero-media {
         height: 62vh;
       }
-      .hero-shield-wrap {
-        width: min(180px, 52vw);
-      }
       .hero-tagline {
         border-left: 3px solid var(--electric-blue);
         border-top: 0;
@@ -486,17 +463,6 @@
         <h1 id="heroTitle" class="hero-title">PRAKITESH<br />BAKSHI</h1>
         <p class="hero-sub">THE NEW STANDARD.</p>
         <p id="heroTagline" class="hero-tagline">"Faster than a debugging session."</p>
-        <div class="hero-shield-wrap" aria-label="Classic Superman S shield emblem">
-          <svg class="hero-shield" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Superman S-shield">
-            <path d="M100 230 L10 80 L10 20 L190 20 L190 80 Z" fill="#CC0000" stroke="#FFD700" stroke-width="8"/>
-            <path d="M100 210 L25 82 L25 35 L175 35 L175 82 Z" fill="none" stroke="#FFD700" stroke-width="6"/>
-            <path d="M65 80 L135 80 L135 65 Q135 50 120 50 L80 50 Q65 50 65 65 Z" fill="#FFD700"/>
-            <path d="M65 80 L100 95 L135 80 L135 95 L100 110 L65 95 Z" fill="#FFD700"/>
-            <path d="M65 125 L135 125 L135 140 Q135 155 120 155 L80 155 Q65 155 65 140 Z" fill="#FFD700"/>
-            <path d="M65 110 L100 125 L65 125 Z" fill="#FFD700"/>
-            <path d="M135 110 L100 125 L135 125 Z" fill="#FFD700"/>
-          </svg>
-        </div>
       </div>
 
       <div id="heroPoster" class="hero-media" aria-label="Superman editorial cover visual">
